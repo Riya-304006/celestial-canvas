@@ -4,19 +4,53 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Celestial Canvas</title>
+  <link rel="stylesheet" href="style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600&family=Poppins:wght@300;400;500&display=swap" rel="stylesheet">
 </head>
 
 <body>
 
-  <h1>Celestial Canvas</h1>
+  <div id="stars"></div>
 
-  <h2 id="loading">Loading...</h2>
+  <!-- LANDING PAGE -->
+  <div id="landing">
+    <h1 class="main-title">🌌 Celestial Canvas</h1>
 
-  <img id="image" />
+    <p class="tagline">
+      Discover the universe on your special day ✨
+    </p>
 
-  <p id="desc"></p>
+  <!-- date input on landing -->
+  <div class="landing-controls">
+    <button id="exploreBtn">Explore 🚀</button>
+  </div>
+</div>
 
-  <div id="container"></div>
+  <!-- MAIN CONTENT -->
+  <div id="mainContent" style="display: none;">
+
+    <h1>Celestial Canvas</h1>
+
+    <div class="controls">
+      <div class="search-wrapper">
+        <input type="text" id="searchInput" placeholder="Search by title" class="text-input" />
+        <button id="searchBtn" class="search-icon-btn">Search</button>
+      </div>
+      <input type="date" id="dateSearchInput" class="text-input" />
+      <select id="sortSelect" class="sort-select">
+        <option value="">Sort By</option>
+        <option value="asc">A &rarr; Z</option>
+        <option value="desc">Z &rarr; A</option>
+      </select>
+      <button id="backBtn" style="display: none;">Back to Grid</button>
+      <button id="themeToggle">🌙</button>
+    </div>
+
+    <h2 id="loading">Loading...</h2>
+
+    <div id="container"></div>
+
+  </div>
 
   <script src="script.js"></script>
 

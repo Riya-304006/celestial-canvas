@@ -1,0 +1,449 @@
+/* Base Theme */
+body {
+  margin: 0;
+  font-family: 'Poppins', sans-serif;
+  background: radial-gradient(circle at top, #0b0f1a, #000),
+              linear-gradient(120deg, rgba(0,198,255,0.05), rgba(0,114,255,0.05));
+  color: white;
+  transition: 0.4s;
+  overflow-x: hidden;
+}
+
+/* Light Mode */
+body.light {
+  background: linear-gradient(to bottom, #ffffff, #eaeaea);
+  color: #111;
+}
+
+/* Landing Page */
+#landing {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  animation: fadeIn 1.5s ease;
+}
+
+.main-title {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 3.5rem;
+  text-shadow: 0 0 20px #00c6ff, 0 0 40px #0072ff;
+  animation: glow 2s infinite alternate;
+}
+
+.tagline {
+  font-size: 18px;
+  max-width: 500px;
+  margin: 20px;
+  opacity: 0.8;
+}
+
+/* Landing Controls */
+.landing-controls {
+  display: flex;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.date-box {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  padding: 10px 14px;
+  border-radius: 14px;
+
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+
+  border: 1px solid rgba(0, 198, 255, 0.3);
+  box-shadow: 0 0 10px rgba(0, 198, 255, 0.2);
+
+  transition: 0.3s;
+}
+
+/* Hover Glow */
+.date-box:hover {
+  box-shadow: 0 0 20px rgba(0, 198, 255, 0.5);
+  border-color: #00c6ff;
+}
+
+/* INPUT FIELD */
+.date-input {
+  border: none;
+  outline: none;
+  background: transparent;
+
+  color: white;
+  font-size: 14px;
+  width: 120px;
+}
+
+/* Light Mode */
+body.light .date-box {
+  background: white;
+  border: 1px solid #ddd;
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+
+body.light .date-input {
+  color: black;
+}
+
+/* ICON */
+.calendar-icon {
+  font-size: 16px;
+  color: #00c6ff;
+}
+/* Buttons */
+button {
+  padding: 12px 18px;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  background: linear-gradient(45deg, #00c6ff, #0072ff);
+  color: white;
+  transition: 0.3s;
+}
+
+button:hover {
+  transform: scale(1.08);
+  box-shadow: 0 0 15px rgba(0,198,255,0.6);
+}
+
+#exploreBtn {
+  border-radius: 30px;
+  padding: 12px 24px;
+}
+
+/* Stars */
+#stars {
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+}
+
+.star {
+  position: absolute;
+  border-radius: 50%;
+  opacity: 0.8;
+  animation: moveStars linear infinite, twinkle 2s infinite alternate;
+}
+
+.star.small { width: 1px; height: 1px; }
+.star.medium { width: 2px; height: 2px; }
+.star.large {
+  width: 3px;
+  height: 3px;
+  box-shadow: 0 0 6px white;
+}
+
+/* Star Animations */
+@keyframes moveStars {
+  from { transform: translateY(0); }
+  to { transform: translateY(-100vh); }
+}
+
+@keyframes twinkle {
+  from { opacity: 0.3; }
+  to { opacity: 1; }
+}
+
+#mainContent {
+  display: none;
+  flex-direction: column;
+  justify-content: center; 
+  align-items: center;      
+  min-height: 80vh;
+  padding: 20px;
+}
+
+.error-msg {
+  color: #ff3366;
+  text-align: center;
+  font-weight: 500;
+  margin-top: 20px;
+  background: rgba(255, 51, 102, 0.1);
+  padding: 15px 25px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 51, 102, 0.3);
+}
+
+.card {
+  position: relative;        
+  max-width: 600px;          
+  width: 100%;
+  box-sizing: border-box;
+  margin: auto;
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(12px);
+  border-radius: 15px;
+  padding: 20px;
+  transition: 0.3s;
+  box-shadow: 0 0 15px rgba(0, 255, 255, 0.2);
+
+  animation: fadeUp 0.6s ease;
+}
+
+.card img {
+  width: 100%;
+  height: 250px;
+  object-fit: cover;
+  display: block;
+  margin-top: 10px;
+  border-radius: 10px;
+  background: rgba(0, 0, 0, 0.6);
+}
+
+/* Light Mode Cards */
+body.light .card {
+  background: white;
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 0 25px rgba(0, 255, 255, 0.6);
+}
+
+/* Video */
+.card iframe {
+  width: 100%;
+  height: 250px;
+  border-radius: 10px;
+  margin-top: 10px;
+}
+
+/* Text */
+.card p {
+  font-size: 14px;
+  line-height: 1.5;
+  margin-top: 10px;
+}
+
+#loading {
+  position: fixed;
+  top: 2px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 18px;
+  z-index: 10;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+/* Animations */
+@keyframes glow {
+  from { text-shadow: 0 0 10px #00c6ff; }
+  to { text-shadow: 0 0 25px #00c6ff, 0 0 50px #0072ff; }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Like Button & Animations */
+.like-btn {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 198, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(0, 198, 255, 0.3);
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  color: white;
+  font-family: 'Poppins', sans-serif;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 0 10px rgba(0, 198, 255, 0.2);
+}
+
+.like-btn:hover {
+  background: rgba(0, 198, 255, 0.2) !important;
+  transform: translateY(-2px) scale(1.05) !important;
+  box-shadow: 0 0 15px rgba(0, 198, 255, 0.5) !important;
+}
+
+.like-btn.liked {
+  background: rgba(0, 198, 255, 0.25) !important;
+  border-color: #00c6ff !important;
+  box-shadow: 0 0 20px rgba(0, 198, 255, 0.6) !important;
+  color: #fff !important;
+}
+
+.heart-icon {
+  font-size: 16px;
+  transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.like-btn.liked .heart-icon {
+  color: #ff3366;
+  text-shadow: 0 0 10px #ff3366;
+  animation: pop 0.4s ease;
+}
+
+.like-btn:active .heart-icon {
+  transform: scale(0.8);
+}
+
+@keyframes pop {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.3); }
+  100% { transform: scale(1); }
+}
+
+body.light .like-btn {
+  background: rgba(255, 255, 255, 0.8);
+  border-color: #ccc;
+  color: #333;
+}
+body.light .like-btn.liked {
+  background: rgba(255, 200, 200, 0.5);
+  border-color: #ff3366;
+}
+
+/* Enhancements: Grid View and Controls */
+.controls {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 30px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.text-input, .sort-select {
+  padding: 12px 18px;
+  border-radius: 10px;
+  border: 1px solid rgba(0, 198, 255, 0.3);
+  background: rgba(255, 255, 255, 0.05);
+  color: white;
+  font-family: 'Poppins', sans-serif;
+  outline: none;
+  transition: 0.3s;
+}
+
+.search-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.search-wrapper .text-input {
+  padding-right: 70px;
+  width: 160px;
+}
+
+.search-icon-btn {
+  position: absolute;
+  right: 15px;
+  background: transparent !important;
+  border: none;
+  font-size: 14px;
+  font-family: 'Poppins', sans-serif;
+  font-weight: 500;
+  cursor: pointer;
+  padding: 0;
+  color: #00c6ff;
+  box-shadow: none !important;
+  transition: transform 0.2s ease, text-shadow 0.2s ease;
+}
+
+.search-icon-btn:hover {
+  transform: scale(1.05) !important;
+  text-shadow: 0 0 8px rgba(0, 198, 255, 0.6);
+}
+
+.text-input:focus, .sort-select:focus {
+  border-color: #00c6ff;
+  box-shadow: 0 0 10px rgba(0, 198, 255, 0.5);
+}
+
+body.light .text-input, body.light .sort-select {
+  background: white;
+  color: black;
+  border: 1px solid #ddd;
+}
+
+/* Fix calendar icon color for dark/light modes */
+input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: invert(1);
+  cursor: pointer;
+}
+
+body.light input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: none;
+}
+
+#themeToggle {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 1000;
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  box-shadow: 0 0 15px rgba(0, 198, 255, 0.4);
+}
+
+#container.grid-view {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 45px;
+  padding: 30px;
+  width: 100%;
+  max-width: 1400px;
+  margin: 0 auto;
+  align-items: stretch;
+}
+
+#container.grid-view .card {
+  height: 100%;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  flex-direction: column;
+}
+
+#container.grid-view .card p {
+  display: none; /* Hide description in grid view */
+}
+
+#container.detail-view {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+}
