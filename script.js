@@ -2,6 +2,53 @@ const API_KEY = "bJK1pjJgvcdA2B6c5N6yIafndV2JmGmjHPwzfrxF";
 
 // --- STATE ---
 let celestialData = [];
+let searchHistory = JSON.parse(localStorage.getItem("searchHistory")) || [];
+
+// --- FALLBACK DATA (NASA API Backup) ---
+const FALLBACK_DATA = [
+  {
+    title: "The Bubble Nebula",
+    url: "https://apod.nasa.gov/apod/image/1604/Bubble_Hubble_3942.jpg",
+    media_type: "image",
+    explanation: "Blown by the wind from a massive star, this interstellar apparition has a surprisingly familiar shape. Cataloged as NGC 7635, it is also known simply as The Bubble Nebula.",
+    date: "2024-04-10"
+  },
+  {
+    title: "Pillars of Creation",
+    url: "https://apod.nasa.gov/apod/image/2210/Pillars_Webb_1141.jpg",
+    media_type: "image",
+    explanation: "This composite image of the Pillars of Creation, a small region in the Eagle Nebula, was captured by the James Webb Space Telescope's Near-Infrared Camera.",
+    date: "2024-04-09"
+  },
+  {
+    title: "The Sombrero Galaxy",
+    url: "https://apod.nasa.gov/apod/image/1105/m104_heritage_960.jpg",
+    media_type: "image",
+    explanation: "The Sombrero Galaxy (M104) is a bright, nearby spiral galaxy. Its prominent dust lane and outer halo of stars and globular clusters give it its name.",
+    date: "2024-04-08"
+  },
+  {
+    title: "Carina Nebula Panorama",
+    url: "https://apod.nasa.gov/apod/image/2207/Carina_Webb_960.jpg",
+    media_type: "image",
+    explanation: "This landscape of 'mountains' and 'valleys' speckled with glittering stars is actually the edge of a nearby, young, star-forming region called NGC 3324 in the Carina Nebula.",
+    date: "2024-04-07"
+  },
+  {
+    title: "The Andromeda Galaxy",
+    url: "https://apod.nasa.gov/apod/image/2208/M31_Subaru_960.jpg",
+    media_type: "image",
+    explanation: "How far can you see? The Andromeda Galaxy, 2.5 million light years away, is the most distant object easily visible to the unaided eye.",
+    date: "2024-04-06"
+  },
+  {
+    title: "The Heart Nebula",
+    url: "https://apod.nasa.gov/apod/image/2302/IC1805_Aylward_960.jpg",
+    media_type: "image",
+    explanation: "Sprawling across almost 200 light-years, the emission nebula IC 1805 is a mix of glowing interstellar gas and dark dust clouds.",
+    date: "2024-04-05"
+  }
+];
 
 // --- ELEMENTS ---
 const loading = document.getElementById("loading");
@@ -14,6 +61,7 @@ const searchBtn = document.getElementById("searchBtn");
 const sortSelect = document.getElementById("sortSelect");
 const backBtn = document.getElementById("backBtn");
 const themeBtn = document.getElementById("themeToggle");
+// searchHistoryContainer will be found dynamically to avoid issues
 
 // --- UTILS & LIKES ---
 function getLikeData(item) {
@@ -72,7 +120,8 @@ function createCardElement(item) {
 function renderGrid(dataArray) {
   container.innerHTML = "";
   
-  if (!dataArray || dataArray.length === 0) {
+  // STRICT HOF: Ensure we have an array
+  if (!Array.isArray(dataArray) || dataArray.length === 0) {
     container.innerHTML = `<p class="error-msg">⚠️ No data found.</p>`;
     return;
   }
@@ -83,8 +132,7 @@ function renderGrid(dataArray) {
   // 1. STRICT HOF: map() to render all cards dynamically
   const cardElements = dataArray.map(item => createCardElement(item));
   
-  // Append all cards (no for loops, though we can use array spread/Destructuring if needed, but append doesn't accept array. We can just use map again or foreach)
-  // Wait, no for loops allowed! We can use map() to append them!
+  // Append all cards
   cardElements.map(el => container.appendChild(el));
 }
 
@@ -101,17 +149,86 @@ function renderDetail(item) {
   container.appendChild(card);
 }
 
+// --- SEARCH HISTORY ---
+
+function saveToHistory(query) {
+  if (!query) return;
+  console.log("Saving to history:", query);
+  
+  // STRICT HOF: filter() to remove existing duplicate
+  searchHistory = searchHistory.filter(item => item !== query);
+  
+  // Add new query to top
+  searchHistory.unshift(query);
+  
+  // STRICT HOF: slice() to limit to 5
+  searchHistory = searchHistory.slice(0, 5);
+  
+  localStorage.setItem("searchHistory", JSON.stringify(searchHistory));
+  renderHistory();
+}
+
+function renderHistory() {
+  const container = document.getElementById("searchHistory");
+  if (!container) return;
+  
+  container.innerHTML = "";
+  if (searchHistory.length === 0) {
+    container.style.display = "none";
+    return;
+  }
+
+  container.style.display = "flex";
+  container.style.flexWrap = "wrap";
+  container.style.gap = "12px";
+  container.style.margin = "15px 0 25px";
+  container.style.justifyContent = "center";
+  container.style.width = "100%";
+  container.style.minHeight = "40px";
+
+  // STRICT HOF: map() to create chips
+  searchHistory.map(term => {
+    const chip = document.createElement("span");
+    chip.className = "history-chip";
+    chip.innerText = term;
+    chip.onclick = () => {
+      searchInput.value = term;
+      searchBtn.onclick();
+    };
+    container.appendChild(chip);
+  });
+
+  const clearBtn = document.createElement("button");
+  clearBtn.className = "clear-history-btn";
+  clearBtn.innerText = "Clear Search History";
+  clearBtn.onclick = () => {
+    searchHistory = [];
+    localStorage.removeItem("searchHistory");
+    renderHistory();
+  };
+  container.appendChild(clearBtn);
+}
+
 // --- DATA FETCHING ---
 
 async function fetchInitialData() {
   try {
     loading.style.display = "block";
     loading.style.opacity = "1";
+    loading.innerText = "Pulling from the cosmos...";
 
-    // Fetch multiple items initially (12 random pictures to populate the grid)
     const response = await fetch(`https://api.nasa.gov/planetary/apod?api_key=${API_KEY}&count=12`);
-    const data = await response.json();
     
+    if (!response.ok) {
+        throw new Error("Server error");
+    }
+
+    const contentType = response.headers.get("content-type");
+    if (!contentType || !contentType.includes("application/json")) {
+        throw new Error("Invalid response format");
+    }
+
+    const data = await response.json();
     celestialData = data;
     renderGrid(celestialData);
 
@@ -120,7 +237,15 @@ async function fetchInitialData() {
 
   } catch (error) {
     console.error("Fetch error:", error);
-    loading.innerText = "Error pulling from the cosmos.";
+    // FALLBACK: Use local data if NASA is down
+    celestialData = FALLBACK_DATA;
+    renderGrid(celestialData);
+    
+    loading.innerText = "NASA is resting. Using cached cosmos.";
+    setTimeout(() => {
+        loading.style.opacity = "0";
+        setTimeout(() => loading.style.display = "none", 300);
+    }, 2000);
   }
 }
 
@@ -139,11 +264,17 @@ searchBtn.onclick = async function() {
   const dateQuery = document.getElementById("dateSearchInput").value;
   
   if (query || dateQuery) {
-    // 3. STRICT HOF: filter() to match title OR date
+    if (query) saveToHistory(query);
+    
+    // 3. STRICT HOF: filter() to match title AND/OR date
     let filteredData = celestialData.filter(item => {
-      const matchTitle = query && item.title && item.title.toLowerCase().includes(query);
-      const matchDate = dateQuery && item.date && item.date === dateQuery;
-      return matchTitle || matchDate;
+      const matchTitle = query ? (item.title && item.title.toLowerCase().includes(query)) : false;
+      const matchDate = dateQuery ? (item.date && item.date === dateQuery) : false;
+      
+      if (query && dateQuery) return matchTitle && matchDate;
+      if (query) return matchTitle;
+      if (dateQuery) return matchDate;
+      return true;
     });
     
     // Fetch specific date from API if not in our loaded array
@@ -152,18 +283,31 @@ searchBtn.onclick = async function() {
         loading.style.display = "block";
         loading.style.opacity = "1";
         
-        const response = await fetch(`https://api.nasa.gov/planetary/apod?api_key=${API_KEY}&date=${dateQuery}`);
+        // Ensure dateQuery is in YYYY-MM-DD format for NASA API
+        let formattedDate = dateQuery;
+        const d = new Date(dateQuery);
+        if (!isNaN(d.getTime())) {
+          // Adjust for timezone to get simple YYYY-MM-DD
+          formattedDate = d.toISOString().split("T")[0];
+        }
+        
+        const response = await fetch(`https://api.nasa.gov/planetary/apod?api_key=${API_KEY}&date=${formattedDate}`);
         const data = await response.json();
         
         loading.style.opacity = "0";
         setTimeout(() => loading.style.display = "none", 300);
 
-        if (!data.error && !data.msg) {
-          celestialData.push(data);
+        if (!data.error && !data.msg && !data.code) {
+          // Ensure no duplicates
+          if (!celestialData.find(item => item.date === data.date)) {
+            celestialData.push(data);
+          }
           filteredData = [data];
         }
       } catch (err) {
         console.error(err);
+        loading.style.opacity = "0";
+        setTimeout(() => loading.style.display = "none", 300);
       }
     }
     
@@ -237,10 +381,11 @@ function generateStars() {
   });
 }
 generateStars();
+renderHistory();
 
 // Auto refresh every 10 minutes (600,000 ms)
 setInterval(() => {
   if (mainContent.style.display === "flex") {
     fetchInitialData();
   }
-}, 60000);
+}, 600000);
