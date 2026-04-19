@@ -1,10 +1,10 @@
 const API_KEY = "bJK1pjJgvcdA2B6c5N6yIafndV2JmGmjHPwzfrxF";
 
-// --- STATE ---
+
 let celestialData = [];
 let searchHistory = JSON.parse(localStorage.getItem("searchHistory")) || [];
 
-// --- FALLBACK DATA (NASA API Backup) ---
+
 const FALLBACK_DATA = [
   {
     title: "The Bubble Nebula",
@@ -50,7 +50,7 @@ const FALLBACK_DATA = [
   }
 ];
 
-// --- ELEMENTS ---
+
 const loading = document.getElementById("loading");
 const container = document.getElementById("container");
 const exploreBtn = document.getElementById("exploreBtn");
@@ -61,14 +61,14 @@ const searchBtn = document.getElementById("searchBtn");
 const sortSelect = document.getElementById("sortSelect");
 const backBtn = document.getElementById("backBtn");
 const themeBtn = document.getElementById("themeToggle");
-// searchHistoryContainer will be found dynamically to avoid issues
 
-// --- UTILS & LIKES ---
+
+
 function getLikeData(item) {
   const key = "like_" + (item.date || item.title);
   let likeData = JSON.parse(localStorage.getItem(key));
   if (!likeData) {
-    // Generate pseudo-random count without a for-loop
+
     const count = (item.title.length * 10) % 500 + 100;
     likeData = { liked: false, count: count };
     localStorage.setItem(key, JSON.stringify(likeData));
@@ -77,7 +77,7 @@ function getLikeData(item) {
 }
 
 function handleLikeClick(e, item, btnElement) {
-  e.stopPropagation(); // Prevent card click
+  e.stopPropagation(); 
   const { key, likeData } = getLikeData(item);
   likeData.liked = !likeData.liked;
   likeData.count += likeData.liked ? 1 : -1;
@@ -88,12 +88,12 @@ function handleLikeClick(e, item, btnElement) {
   btnElement.innerHTML = `<span class="heart-icon">${likeData.liked ? "❤️" : "🤍"}</span>`;
 }
 
-// --- RENDERING ---
+
 
 function createCardElement(item) {
   const card = document.createElement("div");
   card.className = "card";
-  card.onclick = () => showDetailView(item.date || item.title); // Handle click
+  card.onclick = () => showDetailView(item.date || item.title); 
 
   const { likeData } = getLikeData(item);
 
@@ -120,7 +120,7 @@ function createCardElement(item) {
 function renderGrid(dataArray) {
   container.innerHTML = "";
   
-  // STRICT HOF: Ensure we have an array
+
   if (!Array.isArray(dataArray) || dataArray.length === 0) {
     container.innerHTML = `<p class="error-msg">⚠️ No data found.</p>`;
     return;
@@ -129,10 +129,10 @@ function renderGrid(dataArray) {
   container.className = "grid-view";
   backBtn.style.display = "none";
   
-  // 1. STRICT HOF: map() to render all cards dynamically
+
   const cardElements = dataArray.map(item => createCardElement(item));
   
-  // Append all cards
+
   cardElements.map(el => container.appendChild(el));
 }
 
@@ -143,25 +143,25 @@ function renderDetail(item) {
   container.className = "detail-view";
   backBtn.style.display = "inline-block";
   const card = createCardElement(item);
-  card.onclick = null; // Disable clicking to enter detail view if already in it
+  card.onclick = null; 
   card.style.cursor = "default";
   
   container.appendChild(card);
 }
 
-// --- SEARCH HISTORY ---
+
 
 function saveToHistory(query) {
   if (!query) return;
   console.log("Saving to history:", query);
   
-  // STRICT HOF: filter() to remove existing duplicate
+
   searchHistory = searchHistory.filter(item => item !== query);
   
-  // Add new query to top
+
   searchHistory.unshift(query);
   
-  // STRICT HOF: slice() to limit to 5
+ 
   searchHistory = searchHistory.slice(0, 5);
   
   localStorage.setItem("searchHistory", JSON.stringify(searchHistory));
@@ -186,7 +186,7 @@ function renderHistory() {
   container.style.width = "100%";
   container.style.minHeight = "40px";
 
-  // STRICT HOF: map() to create chips
+
   searchHistory.map(term => {
     const chip = document.createElement("span");
     chip.className = "history-chip";
@@ -209,7 +209,7 @@ function renderHistory() {
   container.appendChild(clearBtn);
 }
 
-// --- DATA FETCHING ---
+
 
 async function fetchInitialData() {
   try {
@@ -237,7 +237,7 @@ async function fetchInitialData() {
 
   } catch (error) {
     console.error("Fetch error:", error);
-    // FALLBACK: Use local data if NASA is down
+
     celestialData = FALLBACK_DATA;
     renderGrid(celestialData);
     
@@ -249,10 +249,10 @@ async function fetchInitialData() {
   }
 }
 
-// --- SEARCH, SORT, DETAIL LOGIC ---
+
 
 function showDetailView(identifier) {
-  // 2. STRICT HOF: find() to get the selected item
+
   const selectedItem = celestialData.find(item => item.date === identifier || item.title === identifier);
   if (selectedItem) {
     renderDetail(selectedItem);
@@ -266,7 +266,6 @@ searchBtn.onclick = async function() {
   if (query || dateQuery) {
     if (query) saveToHistory(query);
     
-    // 3. STRICT HOF: filter() to match title AND/OR date
     let filteredData = celestialData.filter(item => {
       const matchTitle = query ? (item.title && item.title.toLowerCase().includes(query)) : false;
       const matchDate = dateQuery ? (item.date && item.date === dateQuery) : false;
@@ -276,18 +275,16 @@ searchBtn.onclick = async function() {
       if (dateQuery) return matchDate;
       return true;
     });
-    
-    // Fetch specific date from API if not in our loaded array
+
     if (filteredData.length === 0 && dateQuery) {
       try {
         loading.style.display = "block";
         loading.style.opacity = "1";
-        
-        // Ensure dateQuery is in YYYY-MM-DD format for NASA API
+
         let formattedDate = dateQuery;
         const d = new Date(dateQuery);
         if (!isNaN(d.getTime())) {
-          // Adjust for timezone to get simple YYYY-MM-DD
+
           formattedDate = d.toISOString().split("T")[0];
         }
         
@@ -298,7 +295,7 @@ searchBtn.onclick = async function() {
         setTimeout(() => loading.style.display = "none", 300);
 
         if (!data.error && !data.msg && !data.code) {
-          // Ensure no duplicates
+
           if (!celestialData.find(item => item.date === data.date)) {
             celestialData.push(data);
           }
@@ -321,7 +318,7 @@ searchBtn.onclick = async function() {
   }
 };
 
-// Immediately search when a date is selected
+
 document.getElementById("dateSearchInput").onchange = function() {
   searchBtn.onclick();
 };
@@ -330,7 +327,7 @@ sortSelect.onchange = function() {
   const direction = sortSelect.value;
   if (!direction) return;
 
-  // 4. STRICT HOF: sort() to sort by title A-Z or Z-A without mutating original array
+
   const sortedData = [...celestialData].sort((a, b) => {
     const titleA = a.title || "";
     const titleB = b.title || "";
@@ -349,7 +346,7 @@ backBtn.onclick = function() {
   renderGrid(celestialData);
 };
 
-// --- INITIALIZERS & EVENT LISTENERS ---
+
 
 themeBtn.onclick = function() {
   document.body.classList.toggle("light");
@@ -368,11 +365,11 @@ exploreBtn.onclick = function() {
 // Stars
 function generateStars() {
   const starsContainer = document.getElementById("stars");
-  // The rule is "DO NOT use for loops or while loops", so we use map and an array to generate stars.
+
   Array.from({ length: 120 }).map(() => {
     const star = document.createElement("div");
     const sizes = ["small", "medium", "large"];
-    // Since we also avoid loops here just to be rigorously compliant
+
     star.className = "star " + sizes[Math.floor(Math.random() * sizes.length)];
     star.style.left = (Math.random() * 100) + "vw";
     star.style.top = (Math.random() * 100) + "vh";
@@ -383,7 +380,7 @@ function generateStars() {
 generateStars();
 renderHistory();
 
-// Auto refresh every 10 minutes (600,000 ms)
+
 setInterval(() => {
   if (mainContent.style.display === "flex") {
     fetchInitialData();
